@@ -24,6 +24,8 @@ A transparent and structured system that ensures every member’s voice shapes t
 
 Governance Guide - https://docs.google.com/document/d/1ggu-hS5sKzzf5aJPNoT1rI4JszuO7xUDzHz3jgLlOcs/edit?usp=sharing
 
+---
+
 ## Quick Start
 
 ### 1. Configure Spreadsheet ID
