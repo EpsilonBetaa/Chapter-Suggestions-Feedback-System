@@ -3,7 +3,7 @@
 **Automated feedback processing and routing for IEEE-HKN at Arizona State University**
 
 [![Google Apps Script](https://img.shields.io/badge/Google%20Apps%20Script-V8-blue.svg)](https://developers.google.com/apps-script)
-[![Version](https://img.shields.io/badge/version-2.0.0-green.svg)](WEBMASTER_GUIDE.md)
+[![Version](https://img.shields.io/badge/version-2.0-green.svg)](WEBMASTER_GUIDE.md)
 [![Status](https://img.shields.io/badge/status-production-success.svg)](WEBMASTER_GUIDE.md)
 
 ---
