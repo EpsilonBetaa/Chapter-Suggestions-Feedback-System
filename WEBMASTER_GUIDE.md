@@ -1732,7 +1732,14 @@ IEEE-HKN-Suggestion-System/
 
 ---
 
-**END OF DOCUMENTATION**
+## END OF DOCUMENTATION
 
-*Last reviewed: November 2025*
-*Next review: August 2026*
+**Last Updated:** November 2025
+**Maintained by:** IEEE-HKN Epsilon Beta Chapter Webmasters
+**Current Webmaster:** Vishesh Singh Rajput (2024-2025, 2025-2026)
+
+For questions, suggestions, or issues, please reach out to current chapter leadership or refer to IEEE-HKN national resources.
+
+Good luck, and thank you for maintaining this system for the chapter!
+
+---
