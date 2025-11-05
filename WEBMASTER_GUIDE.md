@@ -1,9 +1,8 @@
 # IEEE-HKN Chapter Suggestion System
-## Complete Technical Documentation
+## Complete Technical Documentation for Webmaster
 
-**Version:** 2.0.0
+**Version:** 2.0
 **Last Updated:** November 2025
-**Maintained by:** IEEE-HKN Webmaster Team, Arizona State University
 
 ---
 
