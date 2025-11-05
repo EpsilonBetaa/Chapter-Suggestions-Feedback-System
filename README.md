@@ -1,1 +1,466 @@
-# Chapter-Suggestions-Feedback-System
+# IEEE-HKN Chapter Suggestion System
+
+**Automated feedback processing and routing for IEEE-HKN at Arizona State University**
+
+[![Google Apps Script](https://img.shields.io/badge/Google%20Apps%20Script-V8-blue.svg)](https://developers.google.com/apps-script)
+[![Version](https://img.shields.io/badge/version-2.0.0-green.svg)](WEBMASTER_GUIDE.md)
+[![Status](https://img.shields.io/badge/status-production-success.svg)](WEBMASTER_GUIDE.md)
+
+---
+
+## Overview
+
+The IEEE-HKN Chapter Suggestion System is an automated workflow that processes member feedback submitted through Google Forms and instantly routes it to Discord and Slack channels. The system ensures privacy, provides tracking IDs, and enables efficient leadership review of all suggestions.
+
+### Key Features
+
+- **Instant Automation**: Real-time posting to Discord and Slack when forms are submitted
+- **Privacy First**: Support for public, anonymous, and leadership-only submissions
+- **Tracking System**: Unique IDs for every suggestion (format: `HKN-YYYY-XXXX`)
+- **Smart Routing**: Leadership-only suggestions go to private channels
+- **Email Notifications**: Automatic confirmation for confidential submissions
+- **Error Handling**: Comprehensive logging and automatic error notifications to admins
+
+---
+
+## Quick Start
+
+### Prerequisites
+
+- Google account with IEEE-HKN workspace access
+- Editor access to the form response spreadsheet
+- Admin permissions in Discord and Slack workspaces
+- 10 minutes for initial setup
+
+### Installation (5 Steps)
+
+#### 1. **Open the Script Editor**
+```
+Open your Google Form's response spreadsheet
+→ Extensions → Apps Script
+→ Delete default code
+→ Copy-paste the entire Suggestions.js file
+→ Save (Ctrl/Cmd + S)
+```
+
+#### 2. **Configure Spreadsheet ID**
+```javascript
+// Line 13 in Suggestions.js
+const SPREADSHEET_ID = 'YOUR_SPREADSHEET_ID_HERE';
+```
+
+Get your ID from the spreadsheet URL:
+```
+https://docs.google.com/spreadsheets/d/[COPY_THIS_PART]/edit
+```
+
+#### 3. **Add Tracking ID Column**
+```
+In your spreadsheet:
+→ Click Column K header
+→ Type "Tracking ID"
+→ Save
+```
+
+#### 4. **Run Quick Setup**
+```
+In Apps Script editor:
+→ Select "quickSetup" from function dropdown
+→ Click Run (▶ button)
+→ Authorize when prompted (click "Allow")
+→ Wait for completion message
+```
+
+#### 5. **Configure Webhooks**
+```javascript
+// Run these functions in Apps Script editor:
+
+// For Discord
+function setupDiscordWebhooks() {
+  const props = PropertiesService.getScriptProperties();
+  props.setProperty('DISCORD_WEBHOOK_URL', 'YOUR_MAIN_WEBHOOK_URL');
+  props.setProperty('DISCORD_LEADERSHIP_WEBHOOK_URL', 'YOUR_LEADERSHIP_WEBHOOK_URL');
+}
+
+// For Slack (built-in function)
+setupSlackCredentials();
+```
+
+**Get Discord Webhooks:**
+- Server Settings → Integrations → Webhooks → Create Webhook
+
+**Get Slack Token:**
+- [api.slack.com/apps](https://api.slack.com/apps) → Create App → Install to Workspace → Copy Bot Token
+
+### Test Your Installation
+
+```javascript
+// Run in Apps Script editor:
+testFormSubmission();
+```
+
+Check:
+- ✅ Discord channel for test post
+- ✅ Slack channel for test post
+- ✅ Column K in spreadsheet has tracking ID
+- ✅ Debug sheet has log entries
+
+---
+
+## How It Works
+
+### Data Flow
+
+```
+Member submits form
+        ↓
+Google Sheets stores response
+        ↓
+Apps Script trigger fires automatically
+        ↓
+System generates tracking ID (HKN-YYYY-XXXX)
+        ↓
+Validates and processes data
+        ↓
+Routes based on privacy preference:
+    • Public → Discord + Slack
+    • Anonymous → Discord + Slack (name hidden)
+    • Leadership → Discord Leadership Channel only
+        ↓
+Sends confirmation email (if leadership-only)
+        ↓
+Logs all actions to Debug sheet
+```
+
+### Privacy Levels
+
+| User Selects | Name Display | Channels | Email Sent |
+|--------------|--------------|----------|------------|
+| "Post with my name" | Full name shown | Public Discord + Slack | No |
+| "Post anonymously" | "Anonymous Member" | Public Discord + Slack | No |
+| "Contact Leadership" | Name visible to leadership only | Leadership Discord only | Yes |
+
+---
+
+## Configuration
+
+### Enable/Disable Platforms
+
+Edit [Suggestions.js:15-17](Suggestions.js#L15-L17):
+
+```javascript
+const ENABLE_DISCORD = true;   // Set to false to disable
+const ENABLE_SLACK = true;     // Set to false to disable
+```
+
+### Adjust Priority Thresholds
+
+Edit [Suggestions.js:19-21](Suggestions.js#L19-L21):
+
+```javascript
+const PRIORITY_HIGH_THRESHOLD = 8;     // Red color for ≥8
+const PRIORITY_MEDIUM_THRESHOLD = 5;   // Orange for 5-7
+// Below 5 shows maroon (ASU color)
+```
+
+### Column Mapping
+
+The script expects this form structure (in order):
+
+1. Timestamp (auto)
+2. Email Address
+3. Suggestion Text
+4. Category
+5. Importance Explanation
+6. Implementation Ideas
+7. Priority (1-10)
+8. Member Status
+9. Submitter Name
+10. Privacy Preference
+11. **Tracking ID** (auto-generated by script)
+
+If your form has different fields, update `COLUMN_INDEX` in [Suggestions.js:24-36](Suggestions.js#L24-L36).
+
+---
+
+## Troubleshooting
+
+### Script Not Running?
+
+```javascript
+// Check if trigger is installed:
+checkTriggers();
+
+// If missing, install it:
+installTrigger();
+```
+
+### Discord Not Posting?
+
+```javascript
+// Test webhook directly:
+testWebhookDirect();
+
+// If fails, regenerate webhook in Discord:
+// Server Settings → Integrations → Webhooks → Regenerate
+```
+
+### Slack Not Posting?
+
+```javascript
+// Test Slack API:
+testSlackWebhook();
+
+// Check credentials:
+checkSlackConfig();
+```
+
+### Wrong Data in Posts?
+
+```javascript
+// Verify column alignment:
+verifyColumnMapping();
+
+// Update COLUMN_INDEX if form structure changed
+```
+
+### Complete System Check
+
+```javascript
+// Run full diagnostics:
+runFullDiagnostics();
+```
+
+---
+
+## Testing Functions
+
+All functions are available in the Apps Script editor function dropdown:
+
+| Function | Purpose | Duration |
+|----------|---------|----------|
+| `quickSetup()` | Initial setup validation | ~30 sec |
+| `runFullDiagnostics()` | Complete system check | ~45 sec |
+| `testFormSubmission()` | Simulate real submission | ~5 sec |
+| `testWebhookDirect()` | Test Discord webhook | ~5 sec |
+| `testSlackWebhook()` | Test Slack API | ~5 sec |
+| `verifyColumnMapping()` | Check form structure | ~2 sec |
+| `checkTriggers()` | Verify automation setup | ~2 sec |
+| `processLastSubmission()` | Reprocess recent entry | ~5 sec |
+
+---
+
+## Maintenance
+
+### Weekly Tasks
+- Check Debug sheet for errors
+- Verify channels are active
+
+### Monthly Tasks
+- Run `runFullDiagnostics()`
+- Archive Debug sheet if >1000 rows
+
+### Quarterly Tasks
+- Run `runSecurityAudit()`
+- Test leadership webhook routing
+
+### Annual Tasks
+- Archive old suggestions: `archiveOldSuggestions()`
+- Clean old Slack timestamps: `cleanOldMessageTimestamps()`
+- Update documentation with changes
+
+---
+
+## Advanced Features
+
+### Slack Slash Commands
+
+Delete suggestions from Slack:
+```
+/suggesty-delete HKN-2025-1234
+```
+
+List all tracked suggestions:
+```
+/suggesty-list
+```
+
+**Setup Required**: Deploy as Web App and configure Slack slash commands. See [WEBMASTER_GUIDE.md](WEBMASTER_GUIDE.md#711-slack-slash-commands) for details.
+
+### Weekly Analytics Digest
+
+Automatic weekly summary to leadership:
+```javascript
+// Install time-based trigger for:
+sendWeeklyDigest();  // Every Monday at 9 AM
+```
+
+### Monthly Analytics Report
+
+Track submission trends:
+```javascript
+generateMonthlyAnalytics();  // Run on first day of month
+```
+
+---
+
+## Security
+
+### Credentials Management
+
+- ✅ All API keys stored in encrypted Script Properties
+- ✅ No credentials in version control
+- ✅ Hardcoded values auto-migrate to secure storage
+- ✅ Audit function available: `runSecurityAudit()`
+
+### Data Privacy
+
+- Member email addresses only collected if provided
+- Anonymous submissions never linked to identity
+- Leadership-only submissions isolated from public channels
+- All data retained within IEEE-HKN Google Workspace
+- No third-party analytics or tracking
+
+### Access Control
+
+| Resource | Access Level |
+|----------|-------------|
+| Google Sheets | Webmaster + Leadership |
+| Apps Script | Webmaster only |
+| Script Properties | Script only (encrypted) |
+| Debug Logs | Webmaster + Leadership |
+
+---
+
+## Documentation
+
+📘 **[Complete Documentation](WEBMASTER_GUIDE.md)** - Comprehensive technical guide covering:
+
+- **Architecture & Components** - Detailed module breakdown
+- **Configuration Guide** - All settings explained
+- **Setup & Installation** - Step-by-step instructions
+- **User Workflow** - How submissions are processed
+- **Privacy & Security** - Data protection measures
+- **Platform Integrations** - Discord, Slack, Gmail setup
+- **Troubleshooting** - Common issues and solutions
+- **Maintenance & Operations** - Regular tasks and archival
+- **Testing & Diagnostics** - All test functions explained
+- **Advanced Features** - Customization and extensions
+- **FAQ** - Frequently asked questions
+
+---
+
+## Support
+
+### For IEEE-HKN Members
+
+- **Submit Feedback**: Use the official Google Form
+- **Track Submission**: Contact leadership with your tracking ID
+- **Privacy Concerns**: Email leadership directly
+
+### For Webmasters
+
+- **Primary Contact**: Current IEEE-HKN Webmaster
+- **Apps Script Access**: Via Google Sheets → Extensions → Apps Script
+- **Emergency Issues**: Check Debug sheet and run `runFullDiagnostics()`
+
+### Resources
+
+- [Google Apps Script Docs](https://developers.google.com/apps-script)
+- [Discord Webhook Guide](https://discord.com/developers/docs/resources/webhook)
+- [Slack API Reference](https://api.slack.com/docs)
+
+---
+
+## File Structure
+
+```
+Suggestion/
+├── Suggestions.js        # Main script (all functionality)
+├── README.md            # This file (quick reference)
+└── WEBMASTER_GUIDE.md   # Complete technical documentation
+```
+
+---
+
+## System Requirements
+
+| Component | Requirement |
+|-----------|-------------|
+| Google Account | IEEE-HKN workspace access |
+| Google Apps Script | V8 runtime (default) |
+| Google Sheets | Editor access |
+| Discord Server | Admin/webhook permissions |
+| Slack Workspace | Admin/app installation permissions |
+| Browser | Modern browser (Chrome, Firefox, Edge, Safari) |
+
+---
+
+## Technology Stack
+
+- **Backend**: Google Apps Script (JavaScript/V8)
+- **Storage**: Google Sheets
+- **Forms**: Google Forms
+- **Discord**: Webhook API
+- **Slack**: Web API (chat.postMessage)
+- **Email**: Gmail API (built-in)
+
+---
+
+## Version Information
+
+- **Current Version**: 2.0.0
+- **Release Date**: November 2025
+- **Status**: Production
+- **Last Updated**: November 2025
+- **Next Review**: August 2026
+
+---
+
+## License & Usage
+
+This system is developed for IEEE-HKN chapter at Arizona State University. Internal use only.
+
+**Developed and maintained by**: IEEE-HKN Webmaster Team
+
+---
+
+## Quick Reference Card
+
+### Most Common Commands
+
+```javascript
+// Initial setup
+quickSetup()
+
+// Test everything
+runFullDiagnostics()
+
+// Test a submission
+testFormSubmission()
+
+// Check if automation works
+checkTriggers()
+
+// Reprocess last entry
+processLastSubmission()
+
+// Check security
+runSecurityAudit()
+```
+
+### Most Common Issues
+
+| Problem | Solution |
+|---------|----------|
+| Not posting automatically | Run `installTrigger()` |
+| Discord webhook fails | Run `testWebhookDirect()`, regenerate webhook |
+| Slack API fails | Run `checkSlackConfig()`, refresh token |
+| Wrong data in embeds | Run `verifyColumnMapping()`, update indices |
+| Missing tracking ID | Check Column K exists, reauthorize script |
+
+---
+
+**For detailed information, see [WEBMASTER_GUIDE.md](WEBMASTER_GUIDE.md)**
+
+*Questions? Contact the current IEEE-HKN Webmaster*
